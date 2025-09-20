@@ -6,7 +6,7 @@ on:
       repo:
         description: "Repository name (e.g. user/repo)"
         required: true
-        default: ${{ github.repository }}
+        default: ""
       dir:
         description: "Directory to search for .md files"
         required: true
@@ -19,13 +19,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event.inputs.repo }}
+          repository: ${{ github.event.inputs.repo || github.repository }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Concatenate Markdown files
         run: |
           mkdir -p output
-          cat ${{ github.event.inputs.dir }}/*.md > output/all.md
+          find "${{ github.event.inputs.dir }}" -name '*.md' -exec cat {} + > output/all.md
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
